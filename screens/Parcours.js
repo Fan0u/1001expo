@@ -4,7 +4,7 @@ import * as Location from "expo-location";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 const Cordinate = ({ navigation }) => {
-
+	
 	const [location, setLocation] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
 	const [region, setRegion] = useState({
@@ -13,66 +13,51 @@ const Cordinate = ({ navigation }) => {
 		latitudeDelta: 0.015,
 		longitudeDelta: 0.0121,
 	});
-
+	
 	const [permissionResult, setPermissionResult] = useState(undefined);
 	const [deviceLocation, setDeviceLocation] = useState(null);
 	
-  
+	
 	const getPermissionAsync = async () => {
-	  let { status } = await Location.requestForegroundPermissionsAsync();
-	  setPermissionResult(status)
-	  if (status !== 'granted') {
-		setErrorMsg('Permission to access location was denied');
-		return;
-	  }
-	}
-  
-	const getLocationAsync = async() => {
-	  await Location.watchPositionAsync({
-		// accuracy: Location.Accuracy.BestForNavigation,
-		accuracy: Location.Accuracy.Highest,
-		timeInterval: 1000,
-		distanceInterval : 1
-	  }, 
-		(newLocation) => {
-		  setDeviceLocation(newLocation); 
-		  console.log("===========" + newLocation.coords)
-		  setRegion({
-			latitude: newLocation.coords.latitude,
-			longitude: newLocation.coords.longitude,
-			latitudeDelta: 0.015,
-			longitudeDelta: 0.0121,
-		})
+		let { status } = await Location.requestForegroundPermissionsAsync();
+		setPermissionResult(status)
+		if (status !== 'granted') {
+			setErrorMsg("Accès à la localisation non autorisé");
+			return;
 		}
-	  );
-	};
-  
-	useEffect(() => {
-	  // If permission request is not done
-	  if (permissionResult === undefined) {
-		getPermissionAsync();
-	  }
-	}, [permissionResult]);
-  
-	useEffect(()=>{
-	  // If permission has been done and the result is available
-	  if (permissionResult !== undefined) {
-		getLocationAsync()
-	  }
-	}, [permissionResult])
-  
-	let text2 = 'Waiting..';
-	if (errorMsg) {
-	  console.log('errore')
-	  text2 = errorMsg;
-	} else if (deviceLocation && deviceLocation.coords) {
-		// text2 = JSON.stringify(deviceLocation.coords);
-		// setRegion(deviceLocation.coords);
-		text2 = JSON.stringify(deviceLocation.coords);
-	  console.log(deviceLocation)
 	}
+	
+	const getLocationAsync = async() => {
+		await Location.watchPositionAsync({
+			// accuracy: Location.Accuracy.BestForNavigation,
+			accuracy: Location.Accuracy.Highest,
+			timeInterval: 1000,
+			distanceInterval : 1
+		}, 
+		(newLocation) => {
+			setDeviceLocation(newLocation); 
+			//console.log("===========" + newLocation.coords)
+			setRegion({
+				...region,
+				latitude: newLocation.coords.latitude,
+				longitude: newLocation.coords.longitude,
+			})
+		})
+	};
+	
+	useEffect(() => {
+		// If permission request is not done
+		if (permissionResult === undefined) {
+			getPermissionAsync();
+		}
 
+		if (permissionResult !== undefined) {
+			getLocationAsync()
+		}
 
+	}, [permissionResult]);
+	
+	
 	useEffect(() => {
 		(async () => {
 			//   let { status } = await Location.requestPermissionsAsync();
@@ -80,15 +65,26 @@ const Cordinate = ({ navigation }) => {
 			if (status !== "granted") {
 				setErrorMsg("Permission to access location was denied");
 			}
-
+			
 			let location = await Location.getCurrentPositionAsync({});
 			setLocation(location);
-
-
-
 		})();
 	}, []);
 
+	let text2 = 'Waiting..';
+	if (errorMsg) {
+		console.log('errorMsg', errorMsg);
+		text2 = errorMsg;
+	} else if (deviceLocation && deviceLocation.coords) {
+		// text2 = JSON.stringify(deviceLocation.coords);
+		// setRegion(deviceLocation.coords);
+		text2 = JSON.stringify(deviceLocation.coords);
+		//   console.log(deviceLocation)
+	}
+	
+	
+	
+	
 	const getLoc = async () => {
 		
 		
@@ -104,12 +100,12 @@ const Cordinate = ({ navigation }) => {
 			latitudeDelta: 0.015,
 			longitudeDelta: 0.0121,
 		});
-
+		
 		//Location.startLocationUpdatesAsync(GPS_TRACKER)
 		console.log("DERNIERE POSITION " + JSON.stringify( await Location.getLastKnownPositionAsync()))
 		// sendLoc()
 	};
-
+	
 	const getLatLon = async () => {
 		let location = await Location.getCurrentPositionAsync({});
 		return ({
@@ -123,147 +119,148 @@ const Cordinate = ({ navigation }) => {
 		let longitude = location.coords.longitude;
 		console.log("Use these variables to send current location(", latitude, ",", longitude, ")");
 	};
-
+	
 	return (
 		<View style={styles.container}>
-			<View style={styles.camera}>
-				<MapView
-					provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-					mapType="hybrid"
-					style={styles.map}
-					region={region}
-					onMapReady={getLoc}
-					minZoomLevel={19}
-					maxZoomLevel={19}
-					
-				>
-					<Marker
-						coordinate={ region }
-						// coordinate={getLatLon}
-						title="this is a marker"
-						description="this is a marker example"
-					/>
-				</MapView>
-				{/* <MapView
-					// provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-					style={styles.map}
-					region={region}
-					onMapReady={getLoc}
-				>
-					<Marker
-						coordinate={ region }
-						// coordinate={getLatLon}
-						title="this is a marker"
-						description="this is a marker example"
-					/>
-				</MapView> */}
-			</View>
-			<View style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>latitude </Text>
-				<TextInput style={styles.TextInput}> {region.latitude}</TextInput>
-			</View>
-			<View style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>longitude</Text>
-				<TextInput style={styles.TextInput}> {region.longitude}</TextInput>
-			</View>
-			<TouchableOpacity style={styles.btLogin1} onPress={getLoc}>
-				<Text style={styles.buttonText1}>Get coordinates</Text>
-			</TouchableOpacity>
-			<TouchableOpacity style={styles.btLogin1} onPress={sendLoc}>
-				<Text style={styles.buttonText1}>Send coordinates</Text>
-			</TouchableOpacity>
-			<View>
-				<Text>{region.latitude} / {region.longitude}</Text>
-			</View>
-			<View>
-				<Text>{text2}</Text>
-			</View>
+		<View style={styles.camera}>
+		<MapView
+		provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+		mapType="hybrid"
+		style={styles.map}
+		region={region}
+		onMapReady={getLoc}
+		minZoomLevel={19}
+		maxZoomLevel={19}
+		
+		>
+		<Marker
+		coordinate={ region }
+		// coordinate={getLatLon}
+		title="this is a marker"
+		description="this is a marker example"
+		/>
+		</MapView>
+		{/* <MapView
+			// provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+			style={styles.map}
+			region={region}
+			onMapReady={getLoc}
+			>
+			<Marker
+			coordinate={ region }
+			// coordinate={getLatLon}
+			title="this is a marker"
+			description="this is a marker example"
+			/>
+		</MapView> */}
 		</View>
-	);
-};
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		alignItems: "center",
-		marginBottom: 0,
-		backgroundColor: "#fff",
-	},
-	map: {
-		...StyleSheet.absoluteFillObject,
-	},
-	camera: {
-		marginTop: 10,
-		marginBottom: 10,
-		aspectRatio: 0.868,
-		flex: 0.8,
-		borderWidth: 1.5,
-		borderColor: "#3675B8",
-	},
-	buttonContainer: {
-		backgroundColor: "transparent",
-		flexDirection: "row",
-		alignItems: "center",
-		marginHorizontal: 10,
-	},
-	button: {
-		alignSelf: "flex-end",
-		alignItems: "center",
-		color: "#000",
-	},
-	buttonText: {
-		fontSize: 15,
-		color: "#3675B8",
-		marginTop: 6,
-	},
-	buttonText1: {
-		fontSize: 16,
-		color: "#fff",
-	},
-	text: {
-		fontSize: 18,
-		color: "#000",
-	},
-	btLogin: {
-		borderWidth: 1.5,
-		borderColor: "#3675B8",
-		height: 37,
-		backgroundColor: "#3675B8",
-		padding: 7,
-		borderRadius: 5,
-		marginTop: 12,
-		marginBottom: 12,
-		marginLeft: 12,
-		marginRight: 12,
-		width: "46.5%",
-		alignItems: "center",
-	},
-	btLogin1: {
-		borderWidth: 1.5,
-		borderColor: "#3675B8",
-		height: 37,
-		marginHorizontal: 20,
-		backgroundColor: "#3675B8",
-		padding: 7,
-		borderRadius: 5,
-		marginTop: 12,
-		marginBottom: 12,
-		width: "67%",
-		alignItems: "center",
-	},
-	TextInput: {
-		height: 30,
-		marginTop: 6,
-		borderRadius: 5,
-		borderColor: "#3675B8",
-		borderWidth: 1,
-		borderBottomWidth: 1,
-		marginTop: 10,
-		borderBottomColor: "#3675B8",
-		backgroundColor: "#eff9f8",
-		marginHorizontal: 6,
-		width: "52%",
-	},
-});
-
-export default Cordinate;
+		<View style={styles.buttonContainer}>
+		<Text style={styles.buttonText}>latitude </Text>
+		<TextInput style={styles.TextInput}> {region.latitude}</TextInput>
+		</View>
+		<View style={styles.buttonContainer}>
+		<Text style={styles.buttonText}>longitude</Text>
+		<TextInput style={styles.TextInput}> {region.longitude}</TextInput>
+		</View>
+		<TouchableOpacity style={styles.btLogin1} onPress={getLoc}>
+		<Text style={styles.buttonText1}>Get coordinates</Text>
+		</TouchableOpacity>
+		<TouchableOpacity style={styles.btLogin1} onPress={sendLoc}>
+		<Text style={styles.buttonText1}>Send coordinates</Text>
+		</TouchableOpacity>
+		<View>
+		<Text>{region.latitude} / {region.longitude}</Text>
+		</View>
+		<View>
+		<Text>{text2}</Text>
+		</View>
+		</View>
+		);
+	};
+	
+	const styles = StyleSheet.create({
+		container: {
+			flex: 1,
+			alignItems: "center",
+			marginBottom: 0,
+			backgroundColor: "#fff",
+		},
+		map: {
+			...StyleSheet.absoluteFillObject,
+		},
+		camera: {
+			marginTop: 10,
+			marginBottom: 10,
+			aspectRatio: 0.868,
+			flex: 0.8,
+			borderWidth: 1.5,
+			borderColor: "#3675B8",
+		},
+		buttonContainer: {
+			backgroundColor: "transparent",
+			flexDirection: "row",
+			alignItems: "center",
+			marginHorizontal: 10,
+		},
+		button: {
+			alignSelf: "flex-end",
+			alignItems: "center",
+			color: "#000",
+		},
+		buttonText: {
+			fontSize: 15,
+			color: "#3675B8",
+			marginTop: 6,
+		},
+		buttonText1: {
+			fontSize: 16,
+			color: "#fff",
+		},
+		text: {
+			fontSize: 18,
+			color: "#000",
+		},
+		btLogin: {
+			borderWidth: 1.5,
+			borderColor: "#3675B8",
+			height: 37,
+			backgroundColor: "#3675B8",
+			padding: 7,
+			borderRadius: 5,
+			marginTop: 12,
+			marginBottom: 12,
+			marginLeft: 12,
+			marginRight: 12,
+			width: "46.5%",
+			alignItems: "center",
+		},
+		btLogin1: {
+			borderWidth: 1.5,
+			borderColor: "#3675B8",
+			height: 37,
+			marginHorizontal: 20,
+			backgroundColor: "#3675B8",
+			padding: 7,
+			borderRadius: 5,
+			marginTop: 12,
+			marginBottom: 12,
+			width: "67%",
+			alignItems: "center",
+		},
+		TextInput: {
+			height: 30,
+			marginTop: 6,
+			borderRadius: 5,
+			borderColor: "#3675B8",
+			borderWidth: 1,
+			borderBottomWidth: 1,
+			marginTop: 10,
+			borderBottomColor: "#3675B8",
+			backgroundColor: "#eff9f8",
+			marginHorizontal: 6,
+			width: "52%",
+		},
+	});
+	
+	export default Cordinate;
+	
