@@ -5,8 +5,6 @@ import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 import * as TaskManager from "expo-task-manager";
 
-import Colors from "../constants/Colors";
-
 var exportTaskInfo = "No Info";
 var exportTaskInOut = "No Info";
 
@@ -22,12 +20,13 @@ TaskManager.defineTask("test", ({ data, error }) => {
 		
 	}
 	if (data.eventType === Location.LocationGeofencingEventType.Enter) {
-		//console.log("You've entered region:", data.region);
+		console.log("You've entered region:", data.region);
 		exportTaskInfo = "Tu es rentré dans la zone" ;
-		//console.log("LOCATION : ", Location)
+		console.log("LOCATION : ", Location)
 	} else if (data.eventType === Location.LocationGeofencingEventType.Exit) {
-		//console.log("You've left region:", data.region);
+		console.log("You've left region:", data.region);
 		exportTaskInfo = "Tu es sorti de la zone";
+		return Location.PermissionStatus
 	}
 
 });
@@ -84,38 +83,6 @@ const Cordinate = ({ navigation }) => {
 		);
 	};
 
-	const [heading, setHeading] = useState(0); 
-	useEffect(() => {
-		let headingWatcher;
-	
-		const startWatching = async () => {
-		  try {
-			headingWatcher = await watchHeadingAsync((head) => {
-			  if (head.accuracy !== 0) {
-				setHeading(head);
-				console.log(head.trueHeading);
-			  }
-			});
-		  } catch (err) {
-			console.log(err);
-		  }
-		};
-	
-		startWatching();
-	
-		return () => headingWatcher && headingWatcher.remove();
-	}, []);
-
-
-
-	// const getCompassAsync = async () => {
-	// 	await Location.watchHeadingAsync({
-	// 		accuracy:3,
-	// 		latitude:myLocationRegion.latitude,
-	// 		longitude:myLocationRegion.longitude, 
-	// 	})
-		
-	// }
 	////////////////////////////////////////////////////////////////////////////////////////
 	// useEffect(() => {
 	// 	(async () => {
@@ -237,24 +204,6 @@ const Cordinate = ({ navigation }) => {
 		console.log("Use these variables to send current location(", latitude, ",", longitude, ")");
 	};
 
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
-
-
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.camera}>
@@ -338,22 +287,19 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		alignItems: "center",
+		marginBottom: 0,
 		backgroundColor: "#fff",
-		margin:5,
 	},
 	map: {
 		...StyleSheet.absoluteFillObject,
 	},
 	camera: {
-		// marginTop: 10,
-		// marginBottom: 10,
-		// aspectRatio: 1,
-		// flex: 1,
-		height: 200,
-		width: "100%",
-	
-		borderWidth: 1,
-		borderColor: Colors.primary,
+		marginTop: 10,
+		marginBottom: 10,
+		aspectRatio: 0.868,
+		flex: 0.8,
+		borderWidth: 1.5,
+		borderColor: "#3675B8",
 	},
 	buttonContainer: {
 		backgroundColor: "transparent",
