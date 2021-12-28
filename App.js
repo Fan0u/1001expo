@@ -2,6 +2,7 @@
 import React from "react";
 import { View, ActivityIndicator } from "react-native";
 import { useFonts } from "expo-font";
+import * as TaskManager from "expo-task-manager";
 import Colors from "./constants/Colors";
 
 // Redux
@@ -9,6 +10,7 @@ import { createStore, combineReducers } from "redux";
 import { Provider } from "react-redux";
 import placesReducer from "./store/reducers/places";
 import productsReducer from "./store/reducers/products";
+import checkpointsReducer from "./store/reducers/checkpoints";
 
 // Composant
 import AppNavigator from "./navigation/AppNavigator";
@@ -16,6 +18,7 @@ import AppNavigator from "./navigation/AppNavigator";
 const rootReducer = combineReducers({
 	places: placesReducer,
 	products: productsReducer,
+	checkpoints: checkpointsReducer,
 });
 
 const store = createStore(rootReducer);

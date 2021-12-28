@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text, Button, TouchableOpacity, TextInput } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-
 import Geolocation from "react-native-geolocation-service";
 import Constants from "expo-constants";
 
-const Cordinate = ({ navigation }) => {
-
+const Cordinate = ({ navigation }) => {//navigator
+	const popHandler = () => {
+		navigation.pop();
+	};
+	const pushHandler = () => {
+		navigation.push("Field officer's note");
+	};
 	const [location, setLocation] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
 	const [region, setRegion] = useState({
@@ -16,67 +20,6 @@ const Cordinate = ({ navigation }) => {
 		latitudeDelta: 0.015,
 		longitudeDelta: 0.0121,
 	});
-
-
-	console.log('render')
-
-	const [permissionResult, setPermissionResult] = useState(undefined);
-	const [deviceLocation, setDeviceLocation] = useState(null);
-	
-  
-	const getPermissionAsync = async () => {
-	  let { status } = await Location.requestForegroundPermissionsAsync();
-	  setPermissionResult(status)
-	  if (status !== 'granted') {
-		setErrorMsg('Permission to access location was denied');
-		return;
-	  }
-	}
-  
-	const getLocationAsync = async() => {
-	  await Location.watchPositionAsync({
-		accuracy: Location.Accuracy.BestForNavigation,
-		timeInterval: 1000,
-		distanceInterval : 20
-	  }, 
-		(newLocation) => {
-		  setDeviceLocation(newLocation); 
-		  console.log("===========" + newLocation.coords)
-		  setRegion({
-			latitude: newLocation.coords.latitude,
-			longitude: newLocation.coords.longitude,
-			latitudeDelta: 0.015,
-			longitudeDelta: 0.0121,
-		})
-		}
-	  );
-	};
-  
-	useEffect(() => {
-	  // If permission request is not done
-	  if (permissionResult === undefined) {
-		getPermissionAsync();
-	  }
-	}, [permissionResult]);
-  
-	useEffect(()=>{
-	  // If permission has been done and the result is available
-	  if (permissionResult !== undefined) {
-		getLocationAsync()
-	  }
-	}, [permissionResult])
-  
-	let text2 = 'Waiting..';
-	if (errorMsg) {
-	  console.log('errore')
-	  text2 = errorMsg;
-	} else if (deviceLocation && deviceLocation.coords) {
-		// text2 = JSON.stringify(deviceLocation.coords);
-		// setRegion(deviceLocation.coords);
-		text2 = JSON.stringify(deviceLocation.coords);
-	  console.log(deviceLocation)
-	}
-
 
 	useEffect(() => {
 		(async () => {
@@ -88,9 +31,6 @@ const Cordinate = ({ navigation }) => {
 
 			let location = await Location.getCurrentPositionAsync({});
 			setLocation(location);
-
-
-
 		})();
 	}, []);
 
@@ -110,19 +50,10 @@ const Cordinate = ({ navigation }) => {
 			longitudeDelta: 0.0121,
 		});
 
-		//Location.startLocationUpdatesAsync(GPS_TRACKER)
 		console.log("DERNIERE POSITION " + JSON.stringify( await Location.getLastKnownPositionAsync()))
 		// sendLoc()
 	};
 
-	const getLatLon = async () => {
-		let location = await Location.getCurrentPositionAsync({});
-		return ({
-			latitude: location.coords.latitude,
-			longitude: location.coords.longitude,
-		})
-	}
-	
 	const sendLoc = () => {
 		let latitude = location.coords.latitude;
 		let longitude = location.coords.longitude;
@@ -133,20 +64,17 @@ const Cordinate = ({ navigation }) => {
 		<View style={styles.container}>
 			<View style={styles.camera}>
 				<MapView
-					mapType="hybrid"
-					provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+					// provider={PROVIDER_GOOGLE} // remove if not using Google Maps
 					style={styles.map}
-					region={region} 
+					region={region}
 					onMapReady={getLoc}
 				>
 					<Marker
-						coordinate={ region }
-						// coordinate={getLatLon}
-						title="Vous êtes ici"
-						description="Emplacement actuel"
+						coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
+						title="this is a marker"
+						description="this is a marker example"
 					/>
 				</MapView>
-
 			</View>
 			<View style={styles.buttonContainer}>
 				<Text style={styles.buttonText}>latitude </Text>
@@ -162,12 +90,6 @@ const Cordinate = ({ navigation }) => {
 			<TouchableOpacity style={styles.btLogin1} onPress={sendLoc}>
 				<Text style={styles.buttonText1}>Send coordinates</Text>
 			</TouchableOpacity>
-			<View>
-				<Text>{region.latitude} / {region.longitude}</Text>
-			</View>
-			<View>
-				<Text>{text2}</Text>
-			</View>
 		</View>
 	);
 };

@@ -2,14 +2,12 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text, Button, TouchableOpacity, TextInput, Dimensions } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { Video, AVPlaybackStatus } from "expo-av";
-import { Ionicons } from "@expo/vector-icons";
 
 import * as TaskManager from "expo-task-manager";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
-import * as checkpointsActions from "../store/actions/checkpoints";
+import * as checkpointsActions from '../store/actions/checkpoints';
 
 // Variables Globales
 import Colors from "../constants/Colors";
@@ -22,9 +20,6 @@ var exportTaskInfo = "No Info";
 var taskOK = null;
 
 const Parcours = ({ navigation }) => {
-	// Video
-	const video = React.useRef(null);
-	const [status, setStatus] = useState({});
 
 	const [location, setLocation] = useState(null);
 
@@ -37,7 +32,7 @@ const Parcours = ({ navigation }) => {
 		longitudeDelta: 0.0121,
 	});
 
-	// Récupération des checkpoints (CheckpointsReducers)
+	// Récupération des checkpoints
 	const checkpoints = useSelector((state) => state.checkpoints.checkpoints);
 
 	// Cercles de la map
@@ -73,17 +68,19 @@ const Parcours = ({ navigation }) => {
 				...checkpoints,
 				//radius: 1,
 			]);
+			// console.log("maTask : ", maTask);
 		})();
 	}, []);
+	
+	// const dispatch = useDispatch();
+	
+	// useEffect(() => {
 
-	const dispatch = useDispatch();
-
-	// Effets lorsque nous entrons ou sortons d'une zone.
-	useEffect(() => {
-		if (taskOK !== null) {
-			dispatch(checkpointsActions.showCheckpointInformation(taskOK.region));
-		}
-	}, [taskOK]);
+	// 	if (taskOK !== null) {
+	// 		dispatch(checkpointsActions.showCheckpointInformation(taskOK))
+	// 		// console.log("taskOK : ", taskOK)
+	// 	}
+	// }, [taskOK])
 
 	const getPermissionAsync = async () => {
 		let { status } = await Location.requestForegroundPermissionsAsync();
@@ -98,12 +95,14 @@ const Parcours = ({ navigation }) => {
 		await Location.watchPositionAsync(
 			{
 				accuracy: Location.Accuracy.BestForNavigation,
-				timeInterval: 10,
-				distanceInterval: 0.1,
+				// accuracy: Location.Accuracy.Highest,
+				timeInterval: 100,
+				distanceInterval: 0.5,
 			},
 
 			(newLocation) => {
 				setDeviceLocation(newLocation);
+				//console.log("===========" + newLocation.coords)
 				setRegion({
 					...region,
 					latitude: newLocation.coords.latitude,
@@ -129,12 +128,16 @@ const Parcours = ({ navigation }) => {
 		console.log("errorMsg", errorMsg);
 		text2 = errorMsg;
 	} else if (deviceLocation && deviceLocation.coords) {
+		// text2 = JSON.stringify(deviceLocation.coords);
+		// setRegion(deviceLocation.coords);
 		text2 = JSON.stringify(deviceLocation.coords);
+		//   console.log(deviceLocation)
 	}
 
 	const getLoc = async () => {
 		let location = await Location.getCurrentPositionAsync({});
 		setLocation(location);
+		//console.log("press",location.coords)
 		let latitude = location.coords.latitude;
 		let longitude = location.coords.longitude;
 
@@ -145,36 +148,28 @@ const Parcours = ({ navigation }) => {
 			longitudeDelta: 0.0121,
 		});
 
+		//Location.startLocationUpdatesAsync(GPS_TRACKER)
 		console.log("DERNIERE POSITION " + JSON.stringify(await Location.getLastKnownPositionAsync()));
+		// sendLoc()
 	};
 
-	// const getLatLon = async () => {
-	// 	let location = await Location.getCurrentPositionAsync({});
-	// 	return {
-	// 		latitude: location.coords.latitude,
-	// 		longitude: location.coords.longitude,
-	// 	};
-	// };
+	const getLatLon = async () => {
+		let location = await Location.getCurrentPositionAsync({});
+		return {
+			latitude: location.coords.latitude,
+			longitude: location.coords.longitude,
+		};
+	};
 
-	// const sendLoc = () => {
-	// 	let latitude = location.coords.latitude;
-	// 	let longitude = location.coords.longitude;
-	// 	console.log("Use these variables to send current location(", latitude, ",", longitude, ")");
-	// };
+	const sendLoc = () => {
+		let latitude = location.coords.latitude;
+		let longitude = location.coords.longitude;
+		console.log("Use these variables to send current location(", latitude, ",", longitude, ")");
+	};
 
 	return (
 		<View style={styles.container}>
-
-			<View style={styles.blockTitle}>
-				<Text style={styles.title}>{"Alès > Rochebelle"}</Text>
-			</View>
-
-			<View style={styles.blockEnDirection}>
-				<Text style={styles.enDirectionText}>{"En direction de"}</Text>
-				<Text style={styles.enDirectionDestination}>{"Bourse du Travail"}</Text>
-			</View>
-
-			<View style={styles.mapContainer}>
+			<View style={styles.camera}>
 				<MapView
 					provider={PROVIDER_GOOGLE} // remove if not using Google Maps
 					mapType="hybrid"
@@ -192,17 +187,6 @@ const Parcours = ({ navigation }) => {
 					{checkpointsCircles}
 				</MapView>
 			</View>
-
-			<View style={styles.blockIndice}>
-				<Ionicons name="play" style={styles.playIcon} />
-				<Text style={styles.textIndice}>{"« Ouvrez bien les yeux, je ne suis pas très loin. Marchez un peu, je suis en haut du chemin »"}</Text>
-			</View>
-
-			<View style={styles.blockCompass}>
-				<Ionicons name="navigate" style={styles.compassIcon} />
-				<Text style={styles.compassText}>{"Distance de l’objectif : 32 mètres"}</Text>
-			</View>
-
 			<View style={styles.bottomBlock}>
 				<View>
 					<Text>{exportTaskInfo}</Text>
@@ -212,111 +196,32 @@ const Parcours = ({ navigation }) => {
 	);
 };
 
-/*
-	<View style={styles.container}>
-		<Video
-			ref={video}
-			style={styles.video}
-			source={{
-				uri: "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-			}}
-			useNativeControls
-			resizeMode="contain"
-			isLooping
-			onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-		/>
-		<View style={styles.buttons}>
-			<Button
-				title={status.isPlaying ? "Pause" : "Play"}
-				onPress={() => (status.isPlaying ? video.current.pauseAsync() : video.current.playAsync())}
-			/>
-		</View>
-	</View>
-*/
-
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		alignItems: "center",
 		backgroundColor: "#fff",
-		padding: "1%",
+		margin: 0,
 	},
-
-	blockTitle: {
-		width: "100%",
-	},
-	title: {
-		marginLeft: "2%",
-		fontSize: 14,
-	},
-
-	blockEnDirection: {
-		marginVertical: "5%",
-		width: "100%",
-	},
-	enDirectionText: {
-		textAlign: "center",
-		fontSize: 14,
-	},
-	enDirectionDestination: {
-		textAlign: "center",
-		fontSize: 22,
-		fontWeight: "bold",
-	},
-
-	blockIndice: {
-		width: "100%",
-		alignItems: 'center',
-		marginTop: "5%",
-	},
-	playIcon: {
-		alignItems: "center",
-		zIndex: 2,
-		fontSize: 36,
-		paddingLeft:14,
-		paddingTop:10,
-		width: 60,
-		height: 60,
-		borderRadius: 30,
-		color: "white",
-		backgroundColor: "#888888",
-	},
-	textIndice: {
-		marginHorizontal:"5%",
-		marginTop:-30,
-		padding: "10%",
-		textAlign: "center",
-		backgroundColor: "#eeeeee",
-		borderRadius: 10,
-		fontSize: 18,
-	},
-
-	blockCompass: {
-		alignItems: "center",
-		margin: "5%",
-	},
-	compassIcon: {
-		fontSize: 48,
-		color: "#888888",
-	},
-	compassText: {
-		fontSize: 12,
-	},
-
 	map: {
 		...StyleSheet.absoluteFillObject,
 	},
-	mapContainer: {
-		// flex: 1,
-		width: "100%",
-		height: "35%",
+	camera: {
+		// marginTop: 10,
+		// marginBottom: 10,
+		// aspectRatio: 1,
+		flex: 1,
 
-		// borderWidth: 1,
-		// borderColor: Colors.primary,
+		width: "100%",
+
+		borderWidth: 1,
+		borderColor: Colors.primary,
 	},
 	bottomBlock: {
-		height: "50%",
+		height: "12%",
 		width: "96%",
+		position: "absolute",
+		bottom: 0,
 		margin: "2%",
 		padding: 5,
 		backgroundColor: "#fff",
@@ -332,32 +237,25 @@ const styles = StyleSheet.create({
 		backgroundColor: "#fff",
 		borderRadius: 10,
 	},
-	video: {
-		alignSelf: "center",
-		width: 320,
-		height: 200,
-	},
-	buttons: {
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-	},
 });
 
 TaskManager.defineTask("GEOFENCING_TASK", ({ data, error }) => {
+
 	if (error) {
 		console.log(error.message);
 		return;
 	}
 
 	if (data.eventType === Location.LocationGeofencingEventType.Enter) {
-		exportTaskInfo = "Tu es entré dans " + data.region.identifier;
-		// console.log("Tu es entré dans " + data.region.identifier);
-		taskOK = data;
+		exportTaskInfo = "Tu es entré dans la zone " + data.region.identifier;
+		// useDispatch(checkpointsActions.showCheckpointInformation(data.region.id))
+		// return data.region.id
+		// taskOK = data
+		// console.log(checkpointsActions)
+		// console.log(data.region)
+		//console.log("LOCATION : ", Location)
 	} else if (data.eventType === Location.LocationGeofencingEventType.Exit) {
-		exportTaskInfo = "Tu es sorti de " + data.region.identifier;
-		taskOK = data;
-		// console.log("Tu es sorti de " + data.region.identifier);
+		exportTaskInfo = "Tu sorti de la zone " + data.region.identifier;
 	}
 });
 
