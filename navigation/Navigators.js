@@ -184,8 +184,8 @@ const AppTabNavigator = () => {
 		>
 			<TabNavigator.Screen name="TabHome" component={ModalStackNavigator} options={{ title: "Accueil" }} />
 			<TabNavigator.Screen name="TabParcours" component={ParcoursStackNavigator} options={{ title: "Parcours" }} />
-			<TabNavigator.Screen name="TabPlaces" component={PlacesStackNavigator} options={{ title: "Salons" }} />
-			<TabNavigator.Screen name="TabAddProduct" component={AddProductStackNavigator} options={{ title: "Proposer" }} />
+			{/* <TabNavigator.Screen name="TabPlaces" component={PlacesStackNavigator} options={{ title: "Salons" }} />
+			<TabNavigator.Screen name="TabAddProduct" component={AddProductStackNavigator} options={{ title: "Proposer" }} /> */}
 		</TabNavigator.Navigator>
 	);
 };

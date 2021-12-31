@@ -11,6 +11,7 @@ import { Provider } from "react-redux";
 import placesReducer from "./store/reducers/places";
 import productsReducer from "./store/reducers/products";
 import checkpointsReducer from "./store/reducers/checkpoints";
+import stepsReducer from "./store/reducers/steps";
 
 // Composant
 import AppNavigator from "./navigation/AppNavigator";
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
 	places: placesReducer,
 	products: productsReducer,
 	checkpoints: checkpointsReducer,
+	steps: stepsReducer,
 });
 
 const store = createStore(rootReducer);

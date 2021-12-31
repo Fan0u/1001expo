@@ -1,7 +1,7 @@
 {
     "expo": {
-        "name": "Mon premier projet",
-        "slug": "mon-premier-projet",
+        "name": "Parcours",
+        "slug": "app-parcours",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/icon.png",
@@ -15,9 +15,12 @@
         },
         "assetBundlePatterns": ["**/*"],
         "ios": {
-            "supportsTablet": true
+            "bundleIdentifier": "com.roxsys.parcours",
+            "buildNumber": "1.0.0"
         },
         "android": {
+            "package": "com.roxsys.parcours",
+            "versionCode": 1,
             "adaptiveIcon": {
                 "foregroundImage": "./assets/adaptive-icon.png",
                 "backgroundColor": "#FFFFFF"
