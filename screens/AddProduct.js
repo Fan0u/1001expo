@@ -16,7 +16,7 @@ import { useDispatch } from 'react-redux';
 import * as productsActions from '../store/actions/products';
 
 function AddProduct(props) {
-    // State
+    // State 
     const [productName, setProductName] = useState('');
 
     // Variable

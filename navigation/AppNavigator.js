@@ -8,7 +8,7 @@ function AppNavigator() {
         <NavigationContainer>
             <AppDrawerNavigator />
         </NavigationContainer>
-    );
+    ); 
 }
 
 export default AppNavigator;

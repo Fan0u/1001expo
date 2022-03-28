@@ -13,4 +13,4 @@ export const hideCheckpointInformation = identifier => {
 		type: HIDE_CHECKPOINT_INFORMATION,
 		checkpointIdentifier: identifier,
 	}
-}
+} 

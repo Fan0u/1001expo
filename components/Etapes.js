@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text, Button, TouchableOpacity, TextInput, Dimensions, useWindowDimensions } from "react-native";
 import { Video, AVPlaybackStatus } from "expo-av";
 
-// Redux
+// Redux .
 import { useSelector, useDispatch } from "react-redux";
 import * as checkpointsActions from "../store/actions/checkpoints";
 import checkpoints from "../store/reducers/checkpoints";

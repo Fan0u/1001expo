@@ -11,7 +11,7 @@ export const geofencingTask = () => {
 			exportTaskInfo = "Tu es entré dans la zone " + data.region.identifier;
 			// useDispatch(checkpointsActions.showCheckpointInformation(data.region.id))
 			myFunction(data.region.id);
-			console.log(data.region);
+			console.log(data.region); 
 			//console.log("LOCATION : ", Location)
 		} else if (data.eventType === Location.LocationGeofencingEventType.Exit) {
 			exportTaskInfo = "Tu sorti de la zone " + data.region.identifier;

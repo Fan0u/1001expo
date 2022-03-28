@@ -17,7 +17,7 @@ import stepsReducer from "./store/reducers/steps";
 import AppNavigator from "./navigation/AppNavigator";
 
 const rootReducer = combineReducers({
-	places: placesReducer,
+	places: placesReducer, 
 	products: productsReducer,
 	checkpoints: checkpointsReducer,
 	steps: stepsReducer,
